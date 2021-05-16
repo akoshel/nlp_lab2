@@ -34,6 +34,7 @@ class ModelParams:
     BATCH_SIZE: int
     CLIP: int
     N_EPOCHS: int
+    model_out_name: str
     lr: float
     lr_scheduler: LRSchedulerParams
 

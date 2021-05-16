@@ -79,7 +79,7 @@ def train_model(config):
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            torch.save(model.state_dict(), 'tut2-model.pt')
+            torch.save(model.state_dict(), config.model_out_name)
 
         train_history.append(train_loss)
         valid_history.append(valid_loss)
