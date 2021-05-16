@@ -19,15 +19,15 @@ def get_text(x, TRG_vocab):
     return text
 
 
-def generate_translation(src, trg, model, TRG_vocab):
+def generate_translation(src, trg, model, TRG_vocab, SRC_vocab):
     model.eval()
 
     output = model(src, trg, 0) #turn off teacher forcing
     output = output.argmax(dim=-1).cpu().numpy()
-
-    original = get_text(list(trg[:,0].cpu().numpy()), TRG_vocab)
+    src_text = get_text(list(src[:, 0].cpu().numpy()), SRC_vocab)
+    original = get_text(list(trg[:, 0].cpu().numpy()), TRG_vocab)
     generated = get_text(list(output[1:, 0]), TRG_vocab)
-    
+    print('Source: {}'.format(' '.join(src_text)))
     print('Original: {}'.format(' '.join(original)))
     print('Generated: {}'.format(' '.join(generated)))
     print()

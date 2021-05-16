@@ -8,6 +8,11 @@ import my_network
 from load_data import get_dataset, split_data, _len_sort_key
 from config import read_training_pipeline_params
 from train_model import evaluate, train, epoch_time
+import torchtext
+from torchtext.vocab import Vectors
+import numpy as np
+
+np.random.seed(2021)
 
 
 def init_weights(m):
@@ -20,8 +25,14 @@ def train_model(config):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     SRC, TRG, dataset = get_dataset(config.dataset_path)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
+    src_vectors = torchtext.vocab.FastText(language='ru')
+    trg_vectors = torchtext.vocab.FastText(language='en')
+    # src_vectors = Vectors("cc.ru.300.bin", cache="cache")
+    # trg_vectors = Vectors("wiki-news-300d-1M.vec", cache="cache")
     SRC.build_vocab(train_data, min_freq=3)
+    SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
+    TRG.vocab.load_vectors(trg_vectors)
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=config.BATCH_SIZE,
@@ -35,13 +46,13 @@ def train_model(config):
     INPUT_DIM = len(SRC.vocab)
     OUTPUT_DIM = len(TRG.vocab)
 
-
     enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
                   config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
     dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
-                  config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
+                   config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
 
-
+    enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+    dec.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(TRG.vocab.vectors))
     # dont forget to put the model to the right device
     model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
@@ -66,7 +77,7 @@ def train_model(config):
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            torch.save(model.state_dict(), 'tut1-model.pt')
+            torch.save(model.state_dict(), 'tut2-model.pt')
 
         train_history.append(train_loss)
         valid_history.append(valid_loss)
@@ -74,9 +85,6 @@ def train_model(config):
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. PPL: {math.exp(valid_loss):7.3f}')
-
-
-
 
 
 if __name__ == "__main__":

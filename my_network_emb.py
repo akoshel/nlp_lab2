@@ -20,7 +20,7 @@ class Encoder(nn.Module):
         self.emb_dim = emb_dim
         self.hid_dim = hid_dim
         self.n_layers = n_layers
-        # self.dropout = dropout
+        #         self.dropout = dropout
 
         self.embedding = nn.Embedding(
             num_embeddings=input_dim,
