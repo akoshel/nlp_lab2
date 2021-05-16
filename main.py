@@ -9,6 +9,7 @@ from load_data import get_dataset, split_data, _len_sort_key
 from config import read_training_pipeline_params
 from train_model import evaluate, train, epoch_time
 import torchtext
+from loguru import logger
 from torchtext.vocab import Vectors
 import numpy as np
 
@@ -23,6 +24,7 @@ def init_weights(m):
 
 def train_model(config):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    logger.info("Divice is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
     src_vectors = torchtext.vocab.FastText(language='ru')

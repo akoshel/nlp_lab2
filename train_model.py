@@ -36,7 +36,7 @@ def train(model, iterator, optimizer, criterion, clip, train_history=None, valid
         epoch_loss += loss.item()
 
         history.append(loss.cpu().data.numpy())
-        logger.info("Train loss {loss}", loss=history[-1])
+        # logger.info("Train loss {loss}", loss=history[-1])
 
     return epoch_loss / len(iterator)
 
