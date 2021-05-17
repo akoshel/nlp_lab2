@@ -28,18 +28,20 @@ def train_model(config):
     logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
-    src_vectors = torchtext.vocab.FastText(language='ru')
+    # src_vectors = torchtext.vocab.FastText(language='ru')
     # trg_vectors = torchtext.vocab.FastText(language='en')
     # src_vectors = Vectors("cc.ru.300.bin", cache="cache")
     # trg_vectors = Vectors("wiki-news-300d-1M.vec", cache="cache")
     SRC.build_vocab(train_data, min_freq=3)
-    SRC.vocab.load_vectors(src_vectors)
+    # SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
+    print(f"Unique tokens in source (de) vocabulary: {len(SRC.vocab)}")
+    print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=config.BATCH_SIZE,
         device=device,
-        sort_key=_len_sort_key
+        # sort_key=_len_sort_key,
     )
 
     Encoder = my_network.Encoder
@@ -62,8 +64,8 @@ def train_model(config):
     # dec = Decoder(config.net_params.HID_DIM, OUTPUT_DIM, config.net_params.DEC_DROPOUT)
     # model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
-    PAD_IDX = TRG.vocab.stoi['<pad>']
-    optimizer = optim.Adam(model.parameters(), config.lr)
+    PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
+    optimizer = optim.Adam(model.parameters()) #, config.lr
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, **config.lr_scheduler.__dict__)
     train_history = []
