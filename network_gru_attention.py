@@ -23,7 +23,7 @@ class EncoderRNN(nn.Module):
 
 
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, hidden_size, output_size, dropout_p=0.1, max_length=64):
+    def __init__(self, hidden_size, output_size, dropout_p, max_length=64):
         super(AttnDecoderRNN, self).__init__()
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -68,7 +68,7 @@ class Seq2SeqAttn(nn.Module):
         # Again, now batch is the first dimention instead of zero
         batch_size = trg.shape[1]
         max_len = trg.shape[0]
-        trg_vocab_size = self.decoder.output_dim
+        trg_vocab_size = self.decoder.output_size
 
         # tensor to store decoder outputs
         outputs = torch.zeros(max_len, batch_size, trg_vocab_size).to(self.device)
