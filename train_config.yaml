@@ -2,7 +2,7 @@ net_params:
   ENC_EMB_DIM: 300
   DEC_EMB_DIM: 300
   HID_DIM: 512
-  N_LAYERS: 4
+  N_LAYERS: 2
   ENC_DROPOUT: 0.5
   DEC_DROPOUT: 0.5
 split_ration:

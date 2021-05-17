@@ -12,7 +12,7 @@ import torchtext
 from loguru import logger
 from torchtext.vocab import Vectors
 import numpy as np
-
+from utils import generate_translation
 np.random.seed(2021)
 
 
