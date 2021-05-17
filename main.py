@@ -54,7 +54,7 @@ def train_model(config):
                   config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
     dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
                    config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
-    enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+    # enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     # dont forget to put the model to the right device
     model = Seq2Seq(enc, dec, device).to(device)
     # Encoder = network_gru_attention.EncoderRNN
@@ -82,7 +82,7 @@ def train_model(config):
 
         train_loss = train(model, train_iterator, optimizer, criterion, config.CLIP, train_history, valid_history)
         valid_loss = evaluate(model, valid_iterator, criterion)
-        lr_scheduler.step(valid_loss)
+        # lr_scheduler.step(valid_loss)
         end_time = time.time()
 
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
