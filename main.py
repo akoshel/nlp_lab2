@@ -34,7 +34,7 @@ def train_model(config):
     SRC.build_vocab(train_data, min_freq=3)
     SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
-    TRG.vocab.load_vectors(trg_vectors)
+    # TRG.vocab.load_vectors(trg_vectors)
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=config.BATCH_SIZE,
@@ -87,6 +87,13 @@ def train_model(config):
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. PPL: {math.exp(valid_loss):7.3f}')
+        for idx, batch in enumerate(valid_iterator):
+            if idx > 3:
+                break
+            src = batch.src[:, idx:idx + 1]
+            trg = batch.trg[:, idx:idx + 1]
+            generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
+
 
 
 if __name__ == "__main__":
