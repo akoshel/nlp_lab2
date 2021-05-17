@@ -41,7 +41,7 @@ def train_model(config):
         (train_data, valid_data, test_data),
         batch_size=config.BATCH_SIZE,
         device=device,
-        # sort_key=_len_sort_key,
+        sort_key=_len_sort_key,
     )
 
     Encoder = my_network.Encoder
