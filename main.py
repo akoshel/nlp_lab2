@@ -28,13 +28,12 @@ def train_model(config):
     SRC, TRG, dataset = get_dataset(config.dataset_path)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
     src_vectors = torchtext.vocab.FastText(language='ru')
-    trg_vectors = torchtext.vocab.FastText(language='en')
+    # trg_vectors = torchtext.vocab.FastText(language='en')
     # src_vectors = Vectors("cc.ru.300.bin", cache="cache")
     # trg_vectors = Vectors("wiki-news-300d-1M.vec", cache="cache")
     SRC.build_vocab(train_data, min_freq=3)
     SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
-    TRG.vocab.load_vectors(trg_vectors)
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=config.BATCH_SIZE,
@@ -54,7 +53,6 @@ def train_model(config):
                    config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
 
     enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
-    dec.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(TRG.vocab.vectors))
     # dont forget to put the model to the right device
     model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
@@ -66,7 +64,6 @@ def train_model(config):
     valid_history = []
     best_valid_loss = float('inf')
     print("Let's go")
-    model.train()
     for p in model.encoder.parameters():
         p.requires_grad = True
     for p in model.decoder.parameters():
