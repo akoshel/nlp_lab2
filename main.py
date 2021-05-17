@@ -11,6 +11,7 @@ from train_model import evaluate, train, epoch_time
 import torchtext
 from loguru import logger
 from torchtext.vocab import Vectors
+import network_gru_attention
 import numpy as np
 from utils import generate_translation
 np.random.seed(2021)
@@ -47,13 +48,18 @@ def train_model(config):
     INPUT_DIM = len(SRC.vocab)
     OUTPUT_DIM = len(TRG.vocab)
 
-    enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
-                  config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
-    dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
-                   config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
-
-    enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+    # enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
+    #               config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
+    # dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
+    #                config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
+    # enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     # dont forget to put the model to the right device
+    # model = Seq2Seq(enc, dec, device).to(device)
+    Encoder = network_gru_attention.EncoderRNN
+    Decoder = network_gru_attention.AttnDecoderRNN
+    Seq2Seq = network_gru_attention.Seq2SeqAttn
+    enc = Encoder(INPUT_DIM, config.net_params.HID_DIM, device)
+    dec = Decoder(config.net_params.HID_DIM, OUTPUT_DIM, config.net_params.DEC_DROPOUT)
     model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
     PAD_IDX = TRG.vocab.stoi['<pad>']

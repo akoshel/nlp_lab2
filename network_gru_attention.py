@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import random
 
 
 class EncoderRNN(nn.Module):
@@ -11,14 +13,13 @@ class EncoderRNN(nn.Module):
         self.embedding = nn.Embedding(input_size, hidden_size)
         self.gru = nn.GRU(hidden_size, hidden_size)
 
-    def forward(self, input, hidden):
-        embedded = self.embedding(input).view(1, 1, -1)
-        output = embedded
-        output, hidden = self.gru(output, hidden)
-        return output, hidden
+    def forward(self, input):
+        embedded = self.embedding(input)  # <YOUR CODE HERE>
 
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=self.device)
+        embedded = self.dropout(embedded)
+
+        output, hidden = self.gru(embedded)
+        return output, hidden
 
 
 class AttnDecoderRNN(nn.Module):
@@ -54,5 +55,35 @@ class AttnDecoderRNN(nn.Module):
         output = F.log_softmax(self.out(output[0]), dim=1)
         return output, hidden, attn_weights
 
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+
+class Seq2SeqAttn(nn.Module):
+    def __init__(self, encoder, decoder, device):
+        super().__init__()
+
+        self.encoder = encoder
+        self.decoder = decoder
+        self.device = device
+
+    def forward(self, src, trg, teacher_forcing_ratio=0.5):
+        # Again, now batch is the first dimention instead of zero
+        batch_size = trg.shape[1]
+        max_len = trg.shape[0]
+        trg_vocab_size = self.decoder.output_dim
+
+        # tensor to store decoder outputs
+        outputs = torch.zeros(max_len, batch_size, trg_vocab_size).to(self.device)
+
+        # last hidden state of the encoder is used as the initial hidden state of the decoder
+        enc_output, hidden = self.encoder(src)
+
+        # first input to the decoder is the <sos> tokens
+        input = trg[0, :]
+
+        for t in range(1, max_len):
+            output, hidden, cell = self.decoder(input, hidden, enc_output)
+            outputs[t] = output
+            teacher_force = random.random() < teacher_forcing_ratio
+            top1 = output.max(1)[1]
+            input = (trg[t] if teacher_force else top1)
+
+        return outputs
