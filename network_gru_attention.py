@@ -5,13 +5,14 @@ import random
 
 
 class EncoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, device):
+    def __init__(self, input_size, hidden_size, dropout, device):
         super(EncoderRNN, self).__init__()
         self.device = device
         self.hidden_size = hidden_size
 
         self.embedding = nn.Embedding(input_size, hidden_size)
         self.gru = nn.GRU(hidden_size, hidden_size)
+        self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, input):
         embedded = self.embedding(input)  # <YOUR CODE HERE>

@@ -58,7 +58,7 @@ def train_model(config):
     Encoder = network_gru_attention.EncoderRNN
     Decoder = network_gru_attention.AttnDecoderRNN
     Seq2Seq = network_gru_attention.Seq2SeqAttn
-    enc = Encoder(INPUT_DIM, config.net_params.HID_DIM, device)
+    enc = Encoder(INPUT_DIM, config.net_params.HID_DIM, config.net_params.ENC_DROPOUT, device)
     dec = Decoder(config.net_params.HID_DIM, OUTPUT_DIM, config.net_params.DEC_DROPOUT)
     model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
