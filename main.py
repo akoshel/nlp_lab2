@@ -24,7 +24,7 @@ def init_weights(m):
 
 def train_model(config):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    logger.info("Divice is {device}", device=device)
+    logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
     src_vectors = torchtext.vocab.FastText(language='ru')
@@ -34,7 +34,7 @@ def train_model(config):
     SRC.build_vocab(train_data, min_freq=3)
     SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
-    # TRG.vocab.load_vectors(trg_vectors)
+    TRG.vocab.load_vectors(trg_vectors)
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=config.BATCH_SIZE,
@@ -66,6 +66,11 @@ def train_model(config):
     valid_history = []
     best_valid_loss = float('inf')
     print("Let's go")
+    model.train()
+    for p in model.encoder.parameters():
+        p.requires_grad = True
+    for p in model.decoder.parameters():
+        p.requires_grad = True
     for epoch in range(config.N_EPOCHS):
 
         start_time = time.time()
