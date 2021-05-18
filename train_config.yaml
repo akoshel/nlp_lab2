@@ -16,11 +16,11 @@ CLIP: 1
 model_out_name: tut5-model.pt
 lr: 0.003
 lr_scheduler:
-  mode: 'min'
+  mode: min
   factor: 0.3
   patience: 2
   threshold: 0.1
-  threshold_mode: 'abs'
+  threshold_mode: abs
   cooldown: 0
   min_lr: 1e-5
   eps: 1e-08
