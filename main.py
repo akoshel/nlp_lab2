@@ -16,6 +16,8 @@ import network_gru_attention
 import numpy as np
 from utils import generate_translation
 import random
+from helpers import get_bleu
+
 SEED = 2021
 
 random.seed(SEED)
@@ -77,7 +79,8 @@ def train_model(config_path: str):
     # dec = Decoder(config.net_params.HID_DIM, OUTPUT_DIM, config.net_params.DEC_DROPOUT)
     # model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
-    model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+    if config.net_params.pretrained_emb:
+        model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters()) #, config.lr
@@ -119,7 +122,7 @@ def train_model(config_path: str):
             trg = batch.trg[:, idx:idx + 1]
             generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
 
-
+        get_bleu(model, test_iterator, TRG)
 
 if __name__ == "__main__":
     train_model()
