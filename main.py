@@ -22,8 +22,9 @@ def init_weights(m):
     for name, param in m.named_parameters():
         nn.init.uniform_(param, -0.08, 0.08)
 
-
-def train_model(config):
+@click.argument("config_path")
+def train_model(config_path):
+    config = read_training_pipeline_params(config_path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path)
@@ -108,7 +109,6 @@ def train_model(config):
             generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
 
 
-@click.argument("config_path")
+
 if __name__ == "__main__":
-    config = read_training_pipeline_params(config_path)
-    train_model(config)
+    train_model()
