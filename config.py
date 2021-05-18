@@ -5,6 +5,7 @@ import yaml
 
 @dataclass
 class NetParams:
+    pretrained_emb: bool
     ENC_EMB_DIM: int
     DEC_EMB_DIM: int
     HID_DIM: int
