@@ -61,7 +61,7 @@ def train_model(config_path: str):
                    config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
 
     # dont forget to put the model to the right device
-    model = Seq2Seq(enc, dec, device).to(device)
+    model = Seq2Seq(enc, dec, device)
     # Encoder = network_gru_attention.EncoderRNN
     # Decoder = network_gru_attention.AttnDecoderRNN
     # Seq2Seq = network_gru_attention.Seq2SeqAttn
@@ -70,6 +70,7 @@ def train_model(config_path: str):
     # model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
     model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+    model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters()) #, config.lr
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
