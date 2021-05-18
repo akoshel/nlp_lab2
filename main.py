@@ -49,7 +49,8 @@ def train_model(config_path: str):
     SRC.build_vocab(train_data, min_freq=3)
     if config.net_params.pretrained_emb:
         SRC.vocab.load_vectors(src_vectors)
-    save_vocab(SRC.vocab, "src_vocab")
+    torch.save(SRC.vocab, "src_vocab")
+    torch.save(TRG.vocab, "trg_vocab")
     logger.info("Vocab saved")
     TRG.build_vocab(train_data, min_freq=3)
     print(f"Unique tokens in source (ru) vocabulary: {len(SRC.vocab)}")
@@ -124,7 +125,7 @@ def train_model(config_path: str):
             trg = batch.trg[:, idx:idx + 1]
             generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
 
-        get_bleu(model, test_iterator, TRG)
+    get_bleu(model, test_iterator, TRG)
 
 if __name__ == "__main__":
     train_model()
