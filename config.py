@@ -41,6 +41,8 @@ class ModelParams:
     N_EPOCHS: int
     model_out_name: str
     lr: float
+    src_vocab_name: str
+    trg_vocab_name: str
     lr_scheduler: LRSchedulerParams
 
 

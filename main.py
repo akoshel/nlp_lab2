@@ -50,8 +50,8 @@ def train_model(config_path: str):
     if config.net_params.pretrained_emb:
         SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
-    torch.save(SRC.vocab, "src_vocab")
-    torch.save(TRG.vocab, "trg_vocab")
+    torch.save(SRC.vocab, config.src_vocab_name)
+    torch.save(TRG.vocab, config.trg_vocab_name)
     logger.info("Vocab saved")
     print(f"Unique tokens in source (ru) vocabulary: {len(SRC.vocab)}")
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
