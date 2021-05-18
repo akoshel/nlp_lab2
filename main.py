@@ -67,7 +67,7 @@ def train_model(config):
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters(), config.lr)
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
-    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, **config.lr_scheduler.__dict__)
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer) #**config.lr_scheduler.__dict__
     train_history = []
     valid_history = []
     best_valid_loss = float('inf')
@@ -107,5 +107,5 @@ def train_model(config):
 
 
 if __name__ == "__main__":
-    config = read_training_pipeline_params("train_config.yaml")
+    config = read_training_pipeline_params("train_config_simple.yaml")
     train_model(config)

@@ -1,0 +1,26 @@
+net_params:
+  ENC_EMB_DIM: 300
+  DEC_EMB_DIM: 300
+  HID_DIM: 512
+  N_LAYERS: 2
+  ENC_DROPOUT: 0.5
+  DEC_DROPOUT: 0.5
+split_ration:
+  train_size: 0.8
+  valid_size: 0.15
+  test_size: 0.05
+dataset_path: 'datasets/Machine_translation_EN_RU/data.txt'
+BATCH_SIZE: 512
+N_EPOCHS: 20
+CLIP: 1
+model_out_name: tut4-model.pt
+lr: 0.003
+lr_scheduler:
+  mode: min
+  factor: 0.3
+  patience: 2
+  threshold: 0.1
+  threshold_mode: abs
+  cooldown: 0
+  min_lr: 1e-5
+  eps: 1e-08
