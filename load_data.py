@@ -1,6 +1,7 @@
 from torchtext.legacy.datasets import TranslationDataset, Multi30k
 from torchtext.legacy.data import Field, BucketIterator, TabularDataset
 from nltk.tokenize import WordPunctTokenizer
+import pickle
 
 
 tokenizer_W = WordPunctTokenizer()
@@ -34,3 +35,9 @@ def split_data(dataset: TabularDataset, train_size: float, valid_size: float, te
 
 def _len_sort_key(x):
     return len(x.src)
+
+def save_vocab(vocab, path):
+    import pickle
+    output = open(path, 'wb')
+    pickle.dump(vocab, output)
+    output.close()

@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch import optim
 from torchtext.legacy.data import BucketIterator
 import my_network
-from load_data import get_dataset, split_data, _len_sort_key
+from load_data import get_dataset, split_data, _len_sort_key, save_vocab
 from config import read_training_pipeline_params
 from train_model import evaluate, train, epoch_time
 import torchtext
@@ -15,7 +15,14 @@ from torchtext.vocab import Vectors
 import network_gru_attention
 import numpy as np
 from utils import generate_translation
-np.random.seed(2021)
+import random
+SEED = 2021
+
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+torch.backends.cudnn.deterministic = True
 
 
 def init_weights(m):
@@ -39,8 +46,9 @@ def train_model(config_path: str):
     SRC.build_vocab(train_data, min_freq=3)
     if config.net_params.pretrained_emb:
         SRC.vocab.load_vectors(src_vectors)
+    save_vocab(SRC.vocab, "src_vocab")
     TRG.build_vocab(train_data, min_freq=3)
-    print(f"Unique tokens in source (de) vocabulary: {len(SRC.vocab)}")
+    print(f"Unique tokens in source (ru) vocabulary: {len(SRC.vocab)}")
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
     train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
         (train_data, valid_data, test_data),
