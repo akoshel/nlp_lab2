@@ -65,7 +65,7 @@ def train_model(config):
     # model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
-    optimizer = optim.Adam(model.parameters()) #, config.lr
+    optimizer = optim.Adam(model.parameters(), config.lr)
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, **config.lr_scheduler.__dict__)
     train_history = []
