@@ -28,12 +28,14 @@ def train_model(config):
     logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
-    # src_vectors = torchtext.vocab.FastText(language='ru')
+    if config.net_params.pretrained_emb:
+        src_vectors = torchtext.vocab.FastText(language='ru')
     # trg_vectors = torchtext.vocab.FastText(language='en')
     # src_vectors = Vectors("cc.ru.300.bin", cache="cache")
     # trg_vectors = Vectors("wiki-news-300d-1M.vec", cache="cache")
     SRC.build_vocab(train_data, min_freq=3)
-    # SRC.vocab.load_vectors(src_vectors)
+    if config.net_params.pretrained_emb:
+        SRC.vocab.load_vectors(src_vectors)
     TRG.build_vocab(train_data, min_freq=3)
     print(f"Unique tokens in source (de) vocabulary: {len(SRC.vocab)}")
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
@@ -54,7 +56,7 @@ def train_model(config):
                   config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
     dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
                    config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
-    # enc.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+
     # dont forget to put the model to the right device
     model = Seq2Seq(enc, dec, device).to(device)
     # Encoder = network_gru_attention.EncoderRNN
@@ -64,6 +66,7 @@ def train_model(config):
     # dec = Decoder(config.net_params.HID_DIM, OUTPUT_DIM, config.net_params.DEC_DROPOUT)
     # model = Seq2Seq(enc, dec, device).to(device)
     model.apply(init_weights)
+    model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters()) #, config.lr
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
@@ -105,7 +108,7 @@ def train_model(config):
             generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
 
 
-
+@click.argument("config_path")
 if __name__ == "__main__":
-    config = read_training_pipeline_params("train_config_simple.yaml")
+    config = read_training_pipeline_params(config_path)
     train_model(config)
