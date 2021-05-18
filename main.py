@@ -36,6 +36,7 @@ def init_weights(m):
 @click.argument("config_path")
 def train_model(config_path: str):
     config = read_training_pipeline_params(config_path)
+    logger.info("pretrained_emb {b}", b=config.net_params.pretrained_emb)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path)
