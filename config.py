@@ -25,6 +25,10 @@ class LRSchedulerParams:
     factor: float
     patience: int
     threshold: float
+    threshold_mode: str
+    cooldown: int
+    min_lr: float
+    eps: float
 
 @dataclass
 class ModelParams:
