@@ -23,8 +23,9 @@ def init_weights(m):
     for name, param in m.named_parameters():
         nn.init.uniform_(param, -0.08, 0.08)
 
+@click.command(name="main")
 @click.argument("config_path")
-def train_model(config_path):
+def train_model(config_path: str):
     config = read_training_pipeline_params(config_path)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info("Device is {device}", device=device)
