@@ -50,6 +50,7 @@ def train_model(config_path: str):
     if config.net_params.pretrained_emb:
         SRC.vocab.load_vectors(src_vectors)
     save_vocab(SRC.vocab, "src_vocab")
+    logger.info("Vocab saved")
     TRG.build_vocab(train_data, min_freq=3)
     print(f"Unique tokens in source (ru) vocabulary: {len(SRC.vocab)}")
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
