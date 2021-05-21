@@ -76,9 +76,9 @@ def train_model(config_path: str):
     enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
                   config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
     if config.net_params.attention:
-        attn = Attention(config.net_params.ENC_HID_DIM, config.net_params.DEC_HID_DIM)
-        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.ENC_HID_DIM,
-                      config.net_params.DEC_HID_DIM, config.net_params.DEC_DROPOUT, attn)
+        attn = Attention(config.net_params.HID_DIM, config.net_params.HID_DIM)
+        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
+                      config.net_params.HID_DIM, config.net_params.DEC_DROPOUT, attn)
         logger.info("Attention decoder initiated")
     else:
         dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
