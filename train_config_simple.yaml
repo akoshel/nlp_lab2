@@ -22,7 +22,7 @@ trg_vocab_name: trg_vocab_simple
 lr_scheduler:
   mode: min
   factor: 0.3
-  patience: 2
+  patience: 4
   threshold: 0.1
   threshold_mode: abs
   cooldown: 0

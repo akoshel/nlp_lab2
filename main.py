@@ -16,6 +16,10 @@ import numpy as np
 from utils import generate_translation
 import random
 from helpers import get_bleu
+from torch.utils.tensorboard import SummaryWriter
+
+
+
 
 SEED = 2021
 
@@ -35,6 +39,7 @@ def init_weights(m):
 @click.command(name="main")
 @click.argument("config_path")
 def train_model(config_path: str):
+    writer = SummaryWriter()
     config = read_training_pipeline_params(config_path)
     logger.info("pretrained_emb {b}", b=config.net_params.pretrained_emb)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -93,7 +98,7 @@ def train_model(config_path: str):
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters())  # , config.lr
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
-    # lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer) #**config.lr_scheduler.__dict__
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, **config.lr_scheduler.__dict__)
     train_history = []
     valid_history = []
     best_valid_loss = float('inf')
@@ -108,7 +113,7 @@ def train_model(config_path: str):
 
         train_loss = train(model, train_iterator, optimizer, criterion, config.CLIP, train_history, valid_history)
         valid_loss = evaluate(model, valid_iterator, criterion)
-        # lr_scheduler.step(valid_loss)
+        lr_scheduler.step(valid_loss)
         end_time = time.time()
 
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
@@ -119,7 +124,9 @@ def train_model(config_path: str):
 
         train_history.append(train_loss)
         valid_history.append(valid_loss)
-
+        writer.add_scalar('train loss', train_history[-1], epoch)
+        writer.add_scalar('valid loss', valid_history[-1], epoch)
+        writer.add_scalar('learning rate', lr_scheduler.get_last_lr(), epoch)
         print(f'Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. PPL: {math.exp(valid_loss):7.3f}')
