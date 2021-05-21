@@ -1,8 +1,8 @@
 net_params:
-  pretrained_emb: False
+  pretrained_emb: True
   attention: True
-  ENC_EMB_DIM: 256
-  DEC_EMB_DIM: 256
+  ENC_EMB_DIM: 300
+  DEC_EMB_DIM: 300
   HID_DIM: 512
   N_LAYERS: 2
   ENC_DROPOUT: 0.5
@@ -22,7 +22,7 @@ trg_vocab_name: trg_vocab_attn
 lr_scheduler:
   mode: min
   factor: 0.3
-  patience: 2
+  patience: 4
   threshold: 0.1
   threshold_mode: abs
   cooldown: 0
