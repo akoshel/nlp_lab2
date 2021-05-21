@@ -201,6 +201,7 @@ class AttnDecoder(nn.Module):
 
         self.output_dim = output_dim
         self.attention = attention
+        self.hid_dim = dec_hid_dim
 
         self.embedding = nn.Embedding(output_dim, emb_dim)
 
