@@ -32,6 +32,7 @@ def init_weights(m):
     for name, param in m.named_parameters():
         nn.init.uniform_(param, -0.08, 0.08)
 
+
 @click.command(name="main")
 @click.argument("config_path")
 def train_model(config_path: str):
@@ -63,15 +64,24 @@ def train_model(config_path: str):
     )
 
     Encoder = my_network.Encoder
-    Decoder = my_network.Decoder
+    if config.net_params.attention:
+        Attention = my_network.Attention
+        Decoder = my_network.AttnDecoder
+    else:
+        Decoder = my_network.Decoder
     Seq2Seq = my_network.Seq2Seq
     INPUT_DIM = len(SRC.vocab)
     OUTPUT_DIM = len(TRG.vocab)
 
     enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
                   config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
-    dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
-                   config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
+    if config.net_params.attention:
+        attn = Attention(config.net_params.ENC_HID_DIM, config.net_params.DEC_HID_DIM)
+        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.ENC_HID_DIM,
+                      config.net_params.DEC_HID_DIM, config.net_params.DEC_DROPOUT, attn)
+    else:
+        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
+                      config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
 
     # dont forget to put the model to the right device
     model = Seq2Seq(enc, dec, device)
@@ -86,7 +96,7 @@ def train_model(config_path: str):
         model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
-    optimizer = optim.Adam(model.parameters()) #, config.lr
+    optimizer = optim.Adam(model.parameters())  # , config.lr
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
     # lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer) #**config.lr_scheduler.__dict__
     train_history = []
@@ -126,6 +136,7 @@ def train_model(config_path: str):
             generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
 
     get_bleu(model, test_iterator, TRG)
+
 
 if __name__ == "__main__":
     train_model()
