@@ -5,14 +5,13 @@ import torch.nn as nn
 from torch import optim
 from torchtext.legacy.data import BucketIterator
 import my_network
+import network_gru_attention
 from load_data import get_dataset, split_data, _len_sort_key, save_vocab
 from config import read_training_pipeline_params
 from train_model import evaluate, train, epoch_time
 import torchtext
 from loguru import logger
 import click
-from torchtext.vocab import Vectors
-import network_gru_attention
 import numpy as np
 from utils import generate_translation
 import random
@@ -62,36 +61,31 @@ def train_model(config_path: str):
         device=device,
         sort_key=_len_sort_key,
     )
-
-    Encoder = my_network.Encoder
-    if config.net_params.attention:
-        Attention = my_network.Attention
-        Decoder = my_network.AttnDecoder
-    else:
-        Decoder = my_network.Decoder
-    Seq2Seq = my_network.Seq2Seq
     INPUT_DIM = len(SRC.vocab)
     OUTPUT_DIM = len(TRG.vocab)
 
-    enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
-                  config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
     if config.net_params.attention:
+        Encoder = network_gru_attention.Encoder
+        Decoder = network_gru_attention.Decoder
+        Seq2Seq = network_gru_attention.Seq2Seq
+        Attention = network_gru_attention.Attention
         attn = Attention(config.net_params.HID_DIM, config.net_params.HID_DIM)
-        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
-                      config.net_params.HID_DIM, config.net_params.DEC_DROPOUT, attn)
-        logger.info("Attention decoder initiated")
-    else:
-        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
-                      config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
+        enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM, config.net_params.HID_DIM,
+                      config.net_params.ENC_DROPOUT)
+        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM, config.net_params.HID_DIM,
+                      config.net_params.DEC_DROPOUT, attn)
 
-    # dont forget to put the model to the right device
-    model = Seq2Seq(enc, dec, device)
-    # Encoder = network_gru_attention.EncoderRNN
-    # Decoder = network_gru_attention.AttnDecoderRNN
-    # Seq2Seq = network_gru_attention.Seq2SeqAttn
-    # enc = Encoder(INPUT_DIM, config.net_params.HID_DIM, config.net_params.ENC_DROPOUT, device)
-    # dec = Decoder(config.net_params.HID_DIM, OUTPUT_DIM, config.net_params.DEC_DROPOUT)
-    # model = Seq2Seq(enc, dec, device).to(device)
+        model = Seq2Seq(enc, dec, device)
+    else:
+        Encoder = my_network.Encoder
+        Decoder = my_network.Decoder
+        Seq2Seq = my_network.Seq2Seq
+        enc = Encoder(INPUT_DIM, config.net_params.ENC_EMB_DIM, config.net_params.HID_DIM,
+                      config.net_params.N_LAYERS, config.net_params.ENC_DROPOUT)
+        dec = Decoder(OUTPUT_DIM, config.net_params.DEC_EMB_DIM, config.net_params.HID_DIM,
+                          config.net_params.N_LAYERS, config.net_params.DEC_DROPOUT)
+        model = Seq2Seq(enc, dec, device)
+
     model.apply(init_weights)
     if config.net_params.pretrained_emb:
         model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
