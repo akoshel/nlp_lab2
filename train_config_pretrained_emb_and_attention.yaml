@@ -1,6 +1,6 @@
 net_params:
   pretrained_emb: True
-  attention: False
+  attention: True
   ENC_EMB_DIM: 300
   DEC_EMB_DIM: 300
   HID_DIM: 512
