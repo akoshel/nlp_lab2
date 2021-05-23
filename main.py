@@ -31,11 +31,14 @@ torch.cuda.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 
 
-def init_weights(m):
-    # <YOUR CODE HERE>
-    for name, param in m.named_parameters():
-        nn.init.uniform_(param, -0.08, 0.08)
+# def init_weights(m):
+#     # <YOUR CODE HERE>
+#     for name, param in m.named_parameters():
+#         nn.init.uniform_(param, -0.08, 0.08)
 
+def init_weights(m):
+    if hasattr(m, 'weight') and m.weight.dim() > 1:
+        nn.init.xavier_uniform_(m.weight.data)
 
 @click.command(name="main")
 @click.argument("config_path")
