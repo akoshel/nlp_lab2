@@ -1,4 +1,5 @@
 net_params:
+  transformer: False
   pretrained_emb: True
   attention: False
   ENC_EMB_DIM: 300

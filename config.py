@@ -5,6 +5,7 @@ import yaml
 
 @dataclass
 class NetParams:
+    transformer: bool
     pretrained_emb: bool
     attention: bool
     ENC_EMB_DIM: int

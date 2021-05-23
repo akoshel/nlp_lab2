@@ -6,6 +6,7 @@ from torch import optim
 from torchtext.legacy.data import BucketIterator
 import my_network
 import network_gru_attention
+import network_transformer
 from load_data import get_dataset, split_data, _len_sort_key, save_vocab
 from config import read_training_pipeline_params
 from train_model import evaluate, train, epoch_time
@@ -81,6 +82,35 @@ def train_model(config_path: str):
                       config.net_params.DEC_DROPOUT, attn)
 
         model = Seq2Seq(enc, dec, device)
+    elif config.net_params.transformer:
+        Encoder = network_transformer.Encoder
+        Decoder = network_transformer.Decoder
+        Seq2Seq = network_transformer.Seq2Seq
+        ENC_LAYERS = 3
+        DEC_LAYERS = 3
+        ENC_HEADS = 8
+        DEC_HEADS = 8
+        ENC_PF_DIM = 512
+        DEC_PF_DIM = 512
+        SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
+        TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
+        enc = Encoder(INPUT_DIM,
+                      config.net_params.HID_DIM,
+                      ENC_LAYERS,
+                      ENC_HEADS,
+                      ENC_PF_DIM,
+                      config.net_params.ENC_DROPOUT,
+                      device)
+
+        dec = Decoder(OUTPUT_DIM,
+                      config.net_params.HID_DIM,
+                      DEC_LAYERS,
+                      DEC_HEADS,
+                      DEC_PF_DIM,
+                      config.net_params.DEC_DROPOUT,
+                      device)
+
+        model = Seq2Seq(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device).to(device)
     else:
         Encoder = my_network.Encoder
         Decoder = my_network.Decoder

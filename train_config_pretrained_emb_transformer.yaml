@@ -1,25 +1,25 @@
 net_params:
-  transformer: False
+  transformer: True
   pretrained_emb: False
-  attention: False
+  attention: True
   ENC_EMB_DIM: 256
   DEC_EMB_DIM: 256
-  HID_DIM: 512
+  HID_DIM: 256
   N_LAYERS: 2
-  ENC_DROPOUT: 0.5
-  DEC_DROPOUT: 0.5
+  ENC_DROPOUT: 0.1
+  DEC_DROPOUT: 0.1
 split_ration:
   train_size: 0.8
   valid_size: 0.15
   test_size: 0.05
 dataset_path: 'datasets/Machine_translation_EN_RU/data.txt'
-BATCH_SIZE: 512
+BATCH_SIZE: 128
 N_EPOCHS: 20
 CLIP: 1
-model_out_name: tut5-model.pt
-lr: 0.001
-src_vocab_name: src_vocab_simple
-trg_vocab_name: trg_vocab_simple
+model_out_name: attn_model.pt
+lr: 0.003
+src_vocab_name: src_vocab_attn
+trg_vocab_name: trg_vocab_attn
 lr_scheduler:
   mode: min
   factor: 0.3
