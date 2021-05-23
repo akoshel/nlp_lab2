@@ -9,7 +9,8 @@ import network_gru_attention
 import network_transformer
 from load_data import get_dataset, split_data, _len_sort_key, save_vocab
 from config import read_training_pipeline_params
-from train_model import evaluate, train, epoch_time
+from train_model import epoch_time # evaluate, train,
+from network_transformer import evaluate, train
 import torchtext
 from loguru import logger
 import click
@@ -52,9 +53,6 @@ def train_model(config_path: str):
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
     if config.net_params.pretrained_emb:
         src_vectors = torchtext.vocab.FastText(language='ru')
-    # trg_vectors = torchtext.vocab.FastText(language='en')
-    # src_vectors = Vectors("cc.ru.300.bin", cache="cache")
-    # trg_vectors = Vectors("wiki-news-300d-1M.vec", cache="cache")
     SRC.build_vocab(train_data, min_freq=3)
     if config.net_params.pretrained_emb:
         SRC.vocab.load_vectors(src_vectors)
@@ -90,8 +88,6 @@ def train_model(config_path: str):
         Encoder = network_transformer.Encoder
         Decoder = network_transformer.Decoder
         Seq2Seq = network_transformer.Seq2Seq
-        train = network_transformer.train
-        evaluate = network_transformer.evaluate
         SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
         TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
         HID_DIM = 256
@@ -119,8 +115,8 @@ def train_model(config_path: str):
                       DEC_PF_DIM,
                       DEC_DROPOUT,
                       device)
-        model = Seq2Seq(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device).to(device)
-    if False:
+        model = Seq2Seq(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device)
+    if not config.net_params.attention and not config.net_params.transformer:
         Encoder = my_network.Encoder
         Decoder = my_network.Decoder
         Seq2Seq = my_network.Seq2Seq
