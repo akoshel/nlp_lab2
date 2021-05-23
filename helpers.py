@@ -4,7 +4,7 @@ from utils import get_text
 from nltk.translate.bleu_score import corpus_bleu
 
 
-def get_bleu(model, test_iterator, TRG):
+def get_bleu(model, test_iterator, TRG, transformer):
     original_text = []
     generated_text = []
     with torch.no_grad():
@@ -12,7 +12,10 @@ def get_bleu(model, test_iterator, TRG):
             src = batch.src
             trg = batch.trg
 
-            output = model(src, trg, 0)  # turn off teacher forcing
+            if transformer:
+                output, _ = model(src, trg)
+            else:
+                output = model(src, trg, 0)  # turn off teacher forcing
 
             # trg = [trg sent len, batch size]
             # output = [trg sent len, batch size, output dim]

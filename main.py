@@ -49,7 +49,7 @@ def train_model(config_path: str):
     logger.info("pretrained_emb {b}", b=config.net_params.pretrained_emb)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info("Device is {device}", device=device)
-    SRC, TRG, dataset = get_dataset(config.dataset_path)
+    SRC, TRG, dataset = get_dataset(config.dataset_path, config.net_params.transformer)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
     if config.net_params.pretrained_emb:
         src_vectors = torchtext.vocab.FastText(language='ru')
@@ -170,9 +170,9 @@ def train_model(config_path: str):
                 break
             src = batch.src[:, idx:idx + 1]
             trg = batch.trg[:, idx:idx + 1]
-            generate_translation(src, trg, model, TRG.vocab, SRC.vocab)
+            generate_translation(src, trg, model, TRG.vocab, SRC.vocab, config.net_params.transformer)
 
-    get_bleu(model, test_iterator, TRG)
+    get_bleu(model, test_iterator, TRG, config.net_params.transformer)
 
 
 if __name__ == "__main__":

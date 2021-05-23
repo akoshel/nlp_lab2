@@ -19,9 +19,9 @@ def get_text(x, TRG_vocab):
     return text
 
 
-def generate_translation(src, trg, model, TRG_vocab, SRC_vocab):
+def generate_translation(src, trg, model, TRG_vocab, SRC_vocab, transformer=False):
     model.eval()
-    if True:
+    if transformer:
         output, _ = model(src, trg) #turn off teacher forcing
     else:
         output = model(src, trg, 0) #turn off teacher forcing

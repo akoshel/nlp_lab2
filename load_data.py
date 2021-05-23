@@ -9,19 +9,19 @@ def tokenize(x, tokenizer=tokenizer_W):
     return tokenizer.tokenize(x.lower())
 
 
-def get_dataset(path_do_data: str) -> TabularDataset:
+def get_dataset(path_do_data: str, transformer: bool) -> TabularDataset:
 
     SRC = Field(tokenize=tokenize,
                 init_token='<sos>',
                 eos_token='<eos>',
                 lower=True,
-                batch_first=True)
+                batch_first=transformer)
 
     TRG = Field(tokenize=tokenize,
                 init_token='<sos>',
                 eos_token='<eos>',
                 lower=True,
-                batch_first=True,
+                batch_first=transformer,
                 )
 
     dataset = TabularDataset(
