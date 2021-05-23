@@ -87,8 +87,8 @@ def train_model(config_path: str):
         Encoder = network_transformer.Encoder
         Decoder = network_transformer.Decoder
         Seq2Seq = network_transformer.Seq2Seq
-        ENC_LAYERS = 6
-        DEC_LAYERS = 6
+        ENC_LAYERS = 3
+        DEC_LAYERS = 3
         ENC_HEADS = 8
         DEC_HEADS = 8
         ENC_PF_DIM = 512
