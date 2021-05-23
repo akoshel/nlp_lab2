@@ -82,37 +82,42 @@ def train_model(config_path: str):
                       config.net_params.DEC_DROPOUT, attn)
 
         model = Seq2Seq(enc, dec, device)
-    elif config.net_params.transformer:
+    if config.net_params.transformer:
         logger.info("Transformer lets go")
         Encoder = network_transformer.Encoder
         Decoder = network_transformer.Decoder
         Seq2Seq = network_transformer.Seq2Seq
+        train = network_transformer.train
+        evaluate = network_transformer.evaluate
+        SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
+        TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
+        HID_DIM = 256
         ENC_LAYERS = 3
         DEC_LAYERS = 3
         ENC_HEADS = 8
         DEC_HEADS = 8
         ENC_PF_DIM = 512
         DEC_PF_DIM = 512
-        SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
-        TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
+        ENC_DROPOUT = 0.1
+        DEC_DROPOUT = 0.1
+
         enc = Encoder(INPUT_DIM,
-                      config.net_params.HID_DIM,
+                      HID_DIM,
                       ENC_LAYERS,
                       ENC_HEADS,
                       ENC_PF_DIM,
-                      config.net_params.ENC_DROPOUT,
+                      ENC_DROPOUT,
                       device)
 
         dec = Decoder(OUTPUT_DIM,
-                      config.net_params.HID_DIM,
+                      HID_DIM,
                       DEC_LAYERS,
                       DEC_HEADS,
                       DEC_PF_DIM,
-                      config.net_params.DEC_DROPOUT,
+                      DEC_DROPOUT,
                       device)
-
         model = Seq2Seq(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device).to(device)
-    else:
+    if False:
         Encoder = my_network.Encoder
         Decoder = my_network.Decoder
         Seq2Seq = my_network.Seq2Seq
