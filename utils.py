@@ -22,7 +22,7 @@ def get_text(x, TRG_vocab):
 def generate_translation(src, trg, model, TRG_vocab, SRC_vocab):
     model.eval()
 
-    output = model(src, trg, 0) #turn off teacher forcing
+    output, _ = model(src, trg, 0) #turn off teacher forcing
     output = output.argmax(dim=-1).cpu().numpy()
     src_text = get_text(list(src[:, 0].cpu().numpy()), SRC_vocab)
     original = get_text(list(trg[:, 0].cpu().numpy()), TRG_vocab)

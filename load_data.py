@@ -15,14 +15,13 @@ def get_dataset(path_do_data: str) -> TabularDataset:
                 init_token='<sos>',
                 eos_token='<eos>',
                 lower=True,
-                # batch_first=True,
-                )
+                batch_first=True)
 
     TRG = Field(tokenize=tokenize,
                 init_token='<sos>',
                 eos_token='<eos>',
                 lower=True,
-                # batch_first=True,
+                batch_first=True,
                 )
 
     dataset = TabularDataset(
