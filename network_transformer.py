@@ -232,7 +232,7 @@ class Seq2Seq(nn.Module):
         return output, attention
 
 
-def train(model, iterator, optimizer, criterion, clip, valid_history=None):
+def train(model, iterator, optimizer, criterion, clip, train_history=None, valid_history=None):
     model.train()
 
     epoch_loss = 0
