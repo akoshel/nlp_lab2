@@ -95,7 +95,7 @@ class Encoder(nn.Module):
 
         self.device = device
 
-        self.tok_embedding = nn.Embedding(input_dim, hid_dim)
+        self.embedding = nn.Embedding(input_dim, hid_dim)
         self.pos_embedding = nn.Embedding(max_length, hid_dim)
 
         self.layers = nn.ModuleList([EncoderLayer(hid_dim,

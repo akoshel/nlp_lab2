@@ -90,8 +90,8 @@ def train_model(config_path: str):
         DEC_LAYERS = 6
         ENC_HEADS = 8
         DEC_HEADS = 8
-        ENC_PF_DIM = 512
-        DEC_PF_DIM = 512
+        ENC_PF_DIM = 1024
+        DEC_PF_DIM = 1024
         SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
         TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
         enc = Encoder(INPUT_DIM,
@@ -126,7 +126,7 @@ def train_model(config_path: str):
         model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
-    optimizer = optim.Adam(model.parameters())  # , config.lr
+    optimizer = optim.Adam(model.parameters(), config.lr)
     criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, **config.lr_scheduler.__dict__)
     train_history = []
