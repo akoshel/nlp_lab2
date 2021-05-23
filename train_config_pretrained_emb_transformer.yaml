@@ -13,7 +13,7 @@ split_ration:
   valid_size: 0.15
   test_size: 0.05
 dataset_path: 'datasets/Machine_translation_EN_RU/data.txt'
-BATCH_SIZE: 256
+BATCH_SIZE: 128
 N_EPOCHS: 20
 CLIP: 1
 model_out_name: transformer_model.pt
