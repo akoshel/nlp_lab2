@@ -142,10 +142,10 @@ def train_model(config_path: str):
     valid_history = []
     best_valid_loss = float('inf')
     print("Let's go")
-    for p in model.encoder.parameters():
-        p.requires_grad = True
-    for p in model.decoder.parameters():
-        p.requires_grad = True
+    # for p in model.encoder.parameters():
+    #     p.requires_grad = True
+    # for p in model.decoder.parameters():
+    #     p.requires_grad = True
     for epoch in range(config.N_EPOCHS):
 
         start_time = time.time()
