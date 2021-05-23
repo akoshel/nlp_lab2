@@ -83,6 +83,7 @@ def train_model(config_path: str):
 
         model = Seq2Seq(enc, dec, device)
     elif config.net_params.transformer:
+        logger.info("Transformer lets go")
         Encoder = network_transformer.Encoder
         Decoder = network_transformer.Decoder
         Seq2Seq = network_transformer.Seq2Seq
@@ -90,8 +91,8 @@ def train_model(config_path: str):
         DEC_LAYERS = 6
         ENC_HEADS = 8
         DEC_HEADS = 8
-        ENC_PF_DIM = 1024
-        DEC_PF_DIM = 1024
+        ENC_PF_DIM = 512
+        DEC_PF_DIM = 512
         SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
         TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
         enc = Encoder(INPUT_DIM,
