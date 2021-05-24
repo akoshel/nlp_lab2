@@ -398,8 +398,8 @@ def train(model, iterator, optimizer, criterion, clip, _, __):
     epoch_loss = 0
 
     for i, batch in enumerate(iterator):
-        src = batch.src
-        trg = batch.trg
+        src = batch.src.permute(1, 0)
+        trg = batch.trg.permute(1, 0)
 
         optimizer.zero_grad()
 
