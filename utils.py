@@ -22,6 +22,9 @@ def get_text(x, TRG_vocab):
 def generate_translation(src, trg, model, TRG_vocab, SRC_vocab, transformer=False):
     model.eval()
     if transformer:
+        src = src.permute(1, 0)
+        trg = trg.permute(1, 0)
+    if transformer:
         output, _ = model(src, trg) #turn off teacher forcing
     else:
         output = model(src, trg, 0) #turn off teacher forcing
