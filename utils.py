@@ -31,7 +31,7 @@ def generate_translation(src, trg, model, TRG_vocab, SRC_vocab, transformer=Fals
     output = output.argmax(dim=-1).cpu().numpy()
     src_text = get_text(list(src.permute(1, 0)[:, 0].cpu().numpy()), SRC_vocab)
     original = get_text(list(trg.permute(1, 0)[:, 0].cpu().numpy()), TRG_vocab)
-    generated = get_text(list(output.permute(1, 0)[1:, 0]), TRG_vocab)
+    generated = get_text(list(output.T[1:, 0]), TRG_vocab)
     print('Source: {}'.format(' '.join(src_text)))
     print('Original: {}'.format(' '.join(original)))
     print('Generated: {}'.format(' '.join(generated)))
