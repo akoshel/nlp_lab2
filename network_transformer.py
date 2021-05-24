@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+from loguru import logger
 
 class PositionwiseFeedforwardLayer(nn.Module):
     def __init__(self, hid_dim, pf_dim, dropout):
@@ -375,8 +375,8 @@ def evaluate(model, iterator, criterion):
 
     with torch.no_grad():
         for i, batch in enumerate(iterator):
-            src = batch.src
-            trg = batch.trg
+            src = batch.src.permute(1, 0)
+            trg = batch.trg.permute(1, 0)
 
             output, _ = model(src, trg[:, :-1])
 
@@ -396,8 +396,9 @@ def train(model, iterator, optimizer, criterion, clip, _, __):
     model.train()
 
     epoch_loss = 0
-
+    logger.info("train started")
     for i, batch in enumerate(iterator):
+
         src = batch.src.permute(1, 0)
         trg = batch.trg.permute(1, 0)
 
