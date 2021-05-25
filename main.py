@@ -95,8 +95,8 @@ def train_model(config_path: str):
         DEC_LAYERS = 6
         ENC_HEADS = 8
         DEC_HEADS = 8
-        ENC_PF_DIM = 512
-        DEC_PF_DIM = 512
+        ENC_PF_DIM = 1024
+        DEC_PF_DIM = 1024
         ENC_DROPOUT = 0.1
         DEC_DROPOUT = 0.1
 
@@ -142,7 +142,7 @@ def train_model(config_path: str):
     #     p.requires_grad = True
     # for p in model.decoder.parameters():
     #     p.requires_grad = True
-    get_bleu(model, test_iterator, TRG, config.net_params.transformer)
+
     for epoch in range(config.N_EPOCHS):
 
         start_time = time.time()
