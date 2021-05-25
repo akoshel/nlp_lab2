@@ -90,13 +90,13 @@ def train_model(config_path: str):
         Seq2Seq = network_transformer.Seq2Seq
         SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
         TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
-        HID_DIM = 256
-        ENC_LAYERS = 3
-        DEC_LAYERS = 3
+        HID_DIM = 300
+        ENC_LAYERS = 6
+        DEC_LAYERS = 6
         ENC_HEADS = 8
         DEC_HEADS = 8
-        ENC_PF_DIM = 512
-        DEC_PF_DIM = 512
+        ENC_PF_DIM = 1024
+        DEC_PF_DIM = 1024
         ENC_DROPOUT = 0.1
         DEC_DROPOUT = 0.1
 
@@ -128,7 +128,7 @@ def train_model(config_path: str):
 
     model.apply(init_weights)
     if config.net_params.pretrained_emb:
-        model.encoder.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
+        model.encoder.tok_embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters(), config.lr)
@@ -142,6 +142,7 @@ def train_model(config_path: str):
     #     p.requires_grad = True
     # for p in model.decoder.parameters():
     #     p.requires_grad = True
+    get_bleu(model, test_iterator, TRG, config.net_params.transformer)
     for epoch in range(config.N_EPOCHS):
 
         start_time = time.time()
