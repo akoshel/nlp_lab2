@@ -95,8 +95,8 @@ def train_model(config_path: str):
         DEC_LAYERS = 6
         ENC_HEADS = 8
         DEC_HEADS = 8
-        ENC_PF_DIM = 1024
-        DEC_PF_DIM = 1024
+        ENC_PF_DIM = 512
+        DEC_PF_DIM = 512
         ENC_DROPOUT = 0.1
         DEC_DROPOUT = 0.1
 
