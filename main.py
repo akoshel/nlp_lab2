@@ -91,8 +91,8 @@ def train_model(config_path: str):
         SRC_PAD_IDX = SRC.vocab.stoi[SRC.pad_token]
         TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
         HID_DIM = 300
-        ENC_LAYERS = 6
-        DEC_LAYERS = 6
+        ENC_LAYERS = 3
+        DEC_LAYERS = 3
         ENC_HEADS = 8
         DEC_HEADS = 8
         ENC_PF_DIM = 1024
