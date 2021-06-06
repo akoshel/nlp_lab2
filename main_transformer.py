@@ -9,8 +9,8 @@ import network_gru_attention
 import network_transformer
 from load_data import get_dataset, split_data, _len_sort_key, save_vocab
 from config import read_training_pipeline_params
-from train_model import epoch_time # evaluate, train,
-from network_transformer import evaluate, train
+from train_model import epoch_time, evaluate, train
+# from network_transformer import evaluate, train
 import torchtext
 from loguru import logger
 import click
@@ -73,8 +73,6 @@ def train_model(config_path: str):
 
     model = torch.nn.Transformer()
     model.apply(init_weights)
-    if config.net_params.pretrained_emb:
-        model.encoder.tok_embedding = nn.Embedding.from_pretrained(torch.FloatTensor(SRC.vocab.vectors))
     model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
     optimizer = optim.Adam(model.parameters(), config.lr)
