@@ -70,7 +70,7 @@ def train_model(config_path: str):
         seed=0,
         load_best_model_at_end=True,
     )
-    args.place_model_on_device = device
+    # args.place_model_on_device = device
     trainer = Trainer(
         model=model,
         args=args,
