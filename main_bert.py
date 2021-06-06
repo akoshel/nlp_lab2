@@ -74,8 +74,8 @@ def train_model(config_path: str):
     trainer = Trainer(
         model=model,
         args=args,
-        train_dataset=train_data,
-        eval_dataset=valid_data,
+        train_dataset=train_iterator,
+        eval_dataset=valid_iterator,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
     trainer.train()
