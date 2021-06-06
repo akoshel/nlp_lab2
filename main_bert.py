@@ -63,7 +63,6 @@ def train_model(config_path: str):
         output_dir="output",
         evaluation_strategy="steps",
         eval_steps=500,
-        place_model_on_device=device,
         per_device_train_batch_size=128,
         per_device_eval_batch_size=128,
         num_train_epochs=10,
@@ -71,6 +70,7 @@ def train_model(config_path: str):
         seed=0,
         load_best_model_at_end=True,
     )
+    args.place_model_on_device = device
     trainer = Trainer(
         model=model,
         args=args,
