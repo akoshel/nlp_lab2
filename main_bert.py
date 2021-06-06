@@ -33,6 +33,7 @@ def train_model(config_path: str):
     logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path, False)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
+    SRC.build_vocab(train_data, min_freq=3)
     TRG.build_vocab(train_data, min_freq=3)
     torch.save(SRC.vocab, config.src_vocab_name)
     torch.save(TRG.vocab, config.trg_vocab_name)
