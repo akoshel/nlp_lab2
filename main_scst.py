@@ -49,8 +49,8 @@ def train_model(config_path: str):
     logger.info("Device is {device}", device=device)
     SRC, TRG, dataset = get_dataset(config.dataset_path, config.net_params.transformer)
     train_data, valid_data, test_data = split_data(dataset, **config.split_ration.__dict__)
-    SRC.vocab = torch.load("vocabs/src_vocab_attn")
-    TRG.vocab = torch.load("vocabs/trg_vocab_attn")
+    SRC.vocab = torch.load("small_transformer/src_vocab_transformer")
+    TRG.vocab = torch.load("small_transformer/trg_vocab_transformer")
     logger.info("Vocab saved")
     print(f"Unique tokens in source (ru) vocabulary: {len(SRC.vocab)}")
     print(f"Unique tokens in target (en) vocabulary: {len(TRG.vocab)}")
@@ -93,7 +93,7 @@ def train_model(config_path: str):
                   DEC_DROPOUT,
                   device)
     model = Seq2Seq(enc, dec, SRC_PAD_IDX, TRG_PAD_IDX, device)
-    checkpoint = torch.load("models/transformer_model.pt", map_location='cpu')
+    checkpoint = torch.load("small_transformer/transformer_model.pt", map_location='cpu')
     model.load_state_dict(checkpoint, strict=True)
     model.to(device)
     PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
