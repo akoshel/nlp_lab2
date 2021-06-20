@@ -16,12 +16,8 @@ def get_bleu(model, test_iterator, TRG, transformer):
             if transformer:
                 src = src.permute(1, 0)
                 trg = trg.permute(1, 0)
-                try:
-                    output, _ = model(src, trg)
-                    output = output.permute(1, 0, 2)
-                except IndexError as e:
-                    logger.warning("get bleu index error {e}", e=e)
-                    break
+                output, _ = model(src, trg)
+                output = output.permute(1, 0, 2)
             else:
                 output = model(src, trg, 0)  # turn off teacher forcing
 
@@ -32,10 +28,7 @@ def get_bleu(model, test_iterator, TRG, transformer):
             else:
                 output = output.argmax(dim=-1)
 
-            original_text.extend([get_text(x, TRG.vocab) for x in trg.cpu().numpy().T])
-            generated_text.extend([get_text(x, TRG.vocab) for x in output[1:].detach().cpu().numpy().T])
+            original_text.extend([get_text(x, TRG.vocab) for x in trg.cpu().numpy()])
+            generated_text.extend([get_text(x, TRG.vocab) for x in output[:].detach().cpu().numpy()])
 
     print(corpus_bleu([[text] for text in original_text], generated_text) * 100)
-
-    # original_text = flatten(original_text)
-    # generated_text = flatten(generated_text)
