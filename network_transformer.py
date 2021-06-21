@@ -274,31 +274,17 @@ class Decoder(nn.Module):
 
     def forward(self, trg, enc_src, trg_mask, src_mask):
 
-        # trg = [batch size, trg len]
-        # enc_src = [batch size, src len, hid dim]
-        # trg_mask = [batch size, 1, trg len, trg len]
-        # src_mask = [batch size, 1, 1, src len]
-
         batch_size = trg.shape[0]
         trg_len = trg.shape[1]
 
         pos = torch.arange(0, trg_len).unsqueeze(0).repeat(batch_size, 1).to(self.device)
 
-        # pos = [batch size, trg len]
-
         trg = self.dropout((self.tok_embedding(trg) * self.scale) + self.pos_embedding(pos))
-
-        # trg = [batch size, trg len, hid dim]
 
         for layer in self.layers:
             trg, attention = layer(trg, enc_src, trg_mask, src_mask)
 
-        # trg = [batch size, trg len, hid dim]
-        # attention = [batch size, n heads, trg len, src len]
-
         output = self.fc_out(trg)
-
-        # output = [batch size, trg len, output dim]
 
         return output, attention
 
@@ -319,53 +305,55 @@ class Seq2Seq(nn.Module):
         self.device = device
 
     def make_src_mask(self, src):
-        # src = [batch size, src len]
 
         src_mask = (src != self.src_pad_idx).unsqueeze(1).unsqueeze(2)
-
-        # src_mask = [batch size, 1, 1, src len]
 
         return src_mask
 
     def make_trg_mask(self, trg):
-        # trg = [batch size, trg len]
 
         trg_pad_mask = (trg != self.trg_pad_idx).unsqueeze(1).unsqueeze(2)
-
-        # trg_pad_mask = [batch size, 1, 1, trg len]
 
         trg_len = trg.shape[1]
 
         trg_sub_mask = torch.tril(torch.ones((trg_len, trg_len), device=self.device)).bool()
 
-        # trg_sub_mask = [trg len, trg len]
-
         trg_mask = trg_pad_mask & trg_sub_mask
-
-        # trg_mask = [batch size, 1, trg len, trg len]
 
         return trg_mask
 
     def forward(self, src, trg):
-        # src = [batch size, src len]
-        # trg = [batch size, trg len]
-
         src_mask = self.make_src_mask(src)
         trg_mask = self.make_trg_mask(trg)
-
-        # src_mask = [batch size, 1, 1, src len]
-        # trg_mask = [batch size, 1, trg len, trg len]
-
         enc_src = self.encoder(src, src_mask)
-
-        # enc_src = [batch size, src len, hid dim]
-
         output, attention = self.decoder(trg, enc_src, trg_mask, src_mask)
-
-        # output = [batch size, trg len, output dim]
-        # attention = [batch size, n heads, trg len, src len]
-
         return output, attention
+
+    def translate(self, inp, greedy=False, max_len=None, eps=1e-30, **flags):
+        device = next(self.parameters()).device
+        batch_size = inp.shape[0]
+        bos = torch.tensor([self.out_voc.bos_ix] * batch_size, dtype=torch.long, device=device)
+        mask = torch.ones(batch_size, dtype=torch.uint8, device=device)
+        logits_seq = [torch.log(to_one_hot(bos, len(self.out_voc)) + eps)]
+        out_seq = [bos]
+
+        hid_state = self.encode(inp, **flags)
+        while True:
+            hid_state, logits = self.decode(hid_state, out_seq[-1], **flags)
+            if greedy:
+                _, y_t = torch.max(logits, dim=-1)
+            else:
+                probs = F.softmax(logits, dim=-1)
+                y_t = torch.multinomial(probs, 1)[:, 0]
+
+            logits_seq.append(logits)
+            out_seq.append(y_t)
+            mask *= y_t != self.out_voc.eos_ix
+
+            if not mask.any(): break
+            if max_len and len(out_seq) >= max_len: break
+
+        return torch.stack(out_seq, 1), F.log_softmax(torch.stack(logits_seq, 1), dim=-1)
 
 
 def evaluate(model, iterator, criterion):
@@ -428,3 +416,13 @@ def train(model, iterator, optimizer, criterion, clip, _, __):
         epoch_loss += loss.item()
 
     return epoch_loss / len(iterator)
+
+
+def to_one_hot(y, n_dims=None):
+    """ Take integer y (tensor or variable) with n dims and convert it to 1-hot representation with n+1 dims. """
+    y_tensor = y.data
+    y_tensor = y_tensor.to(dtype=torch.long).view(-1, 1)
+    n_dims = n_dims if n_dims is not None else int(torch.max(y_tensor)) + 1
+    y_one_hot = torch.zeros(y_tensor.size()[0], n_dims, device=y.device).scatter_(1, y_tensor, 1)
+    y_one_hot = y_one_hot.view(*y.shape, -1)
+    return y_one_hot
