@@ -1,6 +1,6 @@
-
 def flatten(l):
     return [item for sublist in l for item in sublist]
+
 
 def remove_tech_tokens(mystr, tokens_to_remove=['<eos>', '<sos>', '<unk>', '<pad>']):
     return [x for x in mystr if x not in tokens_to_remove]
@@ -16,7 +16,7 @@ def get_text(x, TRG_vocab):
         else:
             end_idx = len(text) - 1
     text = text[:end_idx]
-    text = remove_tech_tokens(text)
+    text = (text)
     if len(text) < 1:
         text = []
     return text
@@ -31,7 +31,7 @@ def generate_translation(src, trg, model, TRG_vocab, SRC_vocab, transformer=Fals
         output, _ = model(src, trg)
         output = output.permute(1, 0, 2)
     else:
-        output = model(src, trg, 0) #turn off teacher forcing
+        output = model(src, trg, 0)  # turn off teacher forcing
     output = output.argmax(dim=-1).cpu().numpy()
     src_text = get_text(list(src.permute(1, 0)[:, 0].cpu().numpy()), SRC_vocab)
     original = get_text(list(trg.permute(1, 0)[:, 0].cpu().numpy()), TRG_vocab)
